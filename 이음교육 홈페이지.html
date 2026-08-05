@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IEUM STUDY | Premium Korean Language Education</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Noto Sans KR', 'sans-serif'] },
+          colors: {
+            brand: { pale: '#FBFBFF', light: '#EAEBFF', primary: '#3F449E', dark: '#1C1F4A', accent: '#FF6B6B' }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-brand-pale text-brand-dark antialiased font-sans min-h-screen flex flex-col justify-between">
+
+  <!-- 공통 네비게이션 헤더 -->
+  <header class="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+      <button onclick="switchTab('home')" class="text-2xl font-black text-brand-dark tracking-tighter text-left">
+        IEUM<span class="text-brand-primary"> STUDY</span>
+      </button>
+      
+      <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-brand-dark/80">
+        <button id="nav-home" onclick="switchTab('home')" class="nav-btn text-brand-primary font-bold border-b-2 border-brand-primary pb-1 transition">홈</button>
+        <button id="nav-philosophy" onclick="switchTab('philosophy')" class="nav-btn hover:text-brand-primary pb-1 transition">학습 철학</button>
+        <button id="nav-curriculum" onclick="switchTab('curriculum')" class="nav-btn hover:text-brand-primary pb-1 transition">커리큘럼</button>
+        <button id="nav-apply" onclick="switchTab('apply')" class="nav-btn hover:text-brand-primary pb-1 transition">상담 신청</button>
+        <button id="nav-b2b" onclick="switchTab('b2b')" class="nav-btn hover:text-brand-primary pb-1 transition">B2B 제휴 문의</button>
+      </nav>
+
+      <div class="flex items-center space-x-3">
+        <span class="text-xs text-gray-400">SUPPORT FOR:</span>
+        <div class="flex space-x-1.5">
+          <span class="px-2.5 py-1 rounded bg-gray-100 text-gray-600 text-xs font-bold">ENG</span>
+          <span class="px-2.5 py-1 rounded bg-gray-100 text-gray-600 text-xs font-bold">日本語</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 메인 콘텐츠 영역 (탭에 따라 전환) -->
+  <main class="flex-grow pt-20">
+    
+    <!-- 1. 메인 홈 페이지 -->
+    <div id="page-home" class="page-content">
+      <section class="pt-28 pb-32 px-6 bg-white">
+        <div class="max-w-7xl mx-auto grid md:grid-cols-12 gap-12 items-center">
+          <div class="md:col-span-7">
+            <span class="inline-block px-4 py-1.5 bg-brand-light text-brand-primary text-xs font-bold rounded-full mb-6 tracking-wider uppercase">
+              Premium Korean Education for English & Japanese Speakers
+            </span>
+            <h1 class="text-5xl sm:text-6xl font-black text-brand-dark leading-tight tracking-tighter mb-8">
+              언어와 언어를 잇다,<br/> 
+              사람과 문화를 잇다.<br/> 
+              <span class="text-brand-primary relative">IEUM STUDY</span>
+            </h1>
+            <p class="text-xl text-brand-dark/70 mb-12 max-w-2xl leading-relaxed font-light">
+              영어와 일본어를 가교(Bridge) 삼아 한국어를 가장 직관적이고 체계적으로 배웁니다.
+              모국어의 언어적 구조를 활용해 빠른 한국어 마스터를 완성하세요.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-5">
+              <button onclick="switchTab('curriculum')" class="bg-brand-primary text-white px-8 py-5 rounded-xl text-lg font-bold hover:bg-brand-dark transition shadow-xl shadow-brand-primary/20 flex items-center justify-center space-x-2">
+                <span>커리큘럼 확인하기</span>
+                <span>→</span>
+              </button>
+              <button onclick="switchTab('apply')" class="bg-gray-100 text-brand-dark px-8 py-5 rounded-xl text-lg font-bold hover:bg-gray-200 transition text-center">
+                무료 상담 신청하기
+              </button>
+            </div>
+          </div>
+          <div class="md:col-span-5 h-[420px] bg-gradient-to-br from-brand-light via-brand-pale to-white rounded-3xl border border-brand-light shadow-inner flex flex-col items-center justify-center p-8 text-center">
+            <div class="text-6xl mb-4">🌉</div>
+            <h3 class="text-2xl font-bold text-brand-dark mb-2">Connecting Languages</h3>
+            <p class="text-gray-500 text-sm font-light mb-6">English • 日本語 • 한국어</p>
+            <span class="inline-block px-4 py-2 bg-white rounded-full text-xs font-semibold text-brand-primary shadow-sm">맞춤형 대조 학습법 제공</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="py-24 px-6 bg-brand-pale border-t border-gray-100">
+        <div class="max-w-7xl mx-auto grid md:grid-cols-3 gap-8">
+          <div class="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
+            <h3 class="text-xl font-bold mb-3">학습 철학</h3>
+            <p class="text-sm text-gray-600 font-light mb-6">모국어 구조 대조를 통한 IEUM STUDY만의 독창적인 한국어 학습 비전을 확인해보세요.</p>
+            <button onclick="switchTab('philosophy')" class="text-brand-primary text-sm font-bold hover:underline">학습 철학 이동하기 →</button>
+          </div>
+          <div class="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
+            <h3 class="text-xl font-bold mb-3">단계별 커리큘럼</h3>
+            <p class="text-sm text-gray-600 font-light mb-6">파운데이션 입문부터 비즈니스 실전 회화까지 수준별 3단계 코스를 안내합니다.</p>
+            <button onclick="switchTab('curriculum')" class="text-brand-primary text-sm font-bold hover:underline">커리큘럼 이동하기 →</button>
+          </div>
+          <div class="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
+            <h3 class="text-xl font-bold mb-3">1:1 레벨 진단 & 상담</h3>
+            <p class="text-sm text-gray-600 font-light mb-6">전문 언어 튜터와의 1:1 레벨 진단을 통해 나에게 꼭 맞는 맞춤형 플랜을 신청하세요.</p>
+            <button onclick="switchTab('apply')" class="text-brand-primary text-sm font-bold hover:underline">상담 신청 이동하기 →</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- 2. 학습 철학 페이지 -->
+    <div id="page-philosophy" class="page-content hidden">
+      <section class="py-20 bg-brand-dark text-white px-6">
+        <div class="max-w-7xl mx-auto">
+          <span class="text-xs font-bold text-brand-accent tracking-wider uppercase block mb-2">OUR PHILOSOPHY</span>
+          <h1 class="text-4xl sm:text-5xl font-black tracking-tighter mb-4">IEUM STUDY 학습 철학</h1>
+          <p class="text-gray-300 font-light text-lg max-w-2xl">
+            '이음(IEUM)'은 단순한 명칭이 아닌 교육 원칙입니다. 모국어 습관과 한국어를 자연스럽게 이어줍니다.
+          </p>
+        </div>
+      </section>
+
+      <section class="py-24 px-6 bg-white">
+        <div class="max-w-7xl mx-auto space-y-12">
+          <div class="grid md:grid-cols-12 gap-8 items-center bg-brand-pale p-10 rounded-3xl border border-gray-100">
+            <div class="md:col-span-3 text-6xl text-center md:text-left">🔗</div>
+            <div class="md:col-span-9">
+              <span class="text-xs font-bold text-brand-primary block mb-1">PHILOSOPHY 01</span>
+              <h2 class="text-2xl font-bold mb-4">언어의 이음 (Structural Bridge)</h2>
+              <p class="text-gray-600 leading-relaxed font-light mb-4">
+                영어권 학습자에게는 SVO와 SOV 문장 구조의 차이를, 일본어권 학습자에게는 어휘와 조사의 유사성을 체계적으로 대조하여 직관적으로 한국어를 이해하도록 돕습니다.
+              </p>
+              <div class="flex gap-2">
+                <span class="px-3 py-1 bg-white text-xs font-bold text-brand-primary rounded-full border border-gray-200">#모국어대조학습</span>
+                <span class="px-3 py-1 bg-white text-xs font-bold text-brand-primary rounded-full border border-gray-200">#문법적연결고리</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid md:grid-cols-12 gap-8 items-center bg-brand-pale p-10 rounded-3xl border border-gray-100">
+            <div class="md:col-span-3 text-6xl text-center md:text-left">💬</div>
+            <div class="md:col-span-9">
+              <span class="text-xs font-bold text-brand-primary block mb-1">PHILOSOPHY 02</span>
+              <h2 class="text-2xl font-bold mb-4">문맥의 이음 (Contextual Mastery)</h2>
+              <p class="text-gray-600 leading-relaxed font-light mb-4">
+                실제 한국 문화와 언어적 맥락, 사회적 관계에 따른 존댓말과 뉘앙스의 차이까지 습득하도록 설계되어 일상과 비즈니스 현장에서 통하는 표현을 체화합니다.
+              </p>
+              <div class="flex gap-2">
+                <span class="px-3 py-1 bg-white text-xs font-bold text-brand-primary rounded-full border border-gray-200">#문화맥락이해</span>
+                <span class="px-3 py-1 bg-white text-xs font-bold text-brand-primary rounded-full border border-gray-200">#실전뉘앙스</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid md:grid-cols-12 gap-8 items-center bg-brand-pale p-10 rounded-3xl border border-gray-100">
+            <div class="md:col-span-3 text-6xl text-center md:text-left">🎯</div>
+            <div class="md:col-span-9">
+              <span class="text-xs font-bold text-brand-primary block mb-1">PHILOSOPHY 03</span>
+              <h2 class="text-2xl font-bold mb-4">성장의 이음 (Continuous Growth)</h2>
+              <p class="text-gray-600 leading-relaxed font-light mb-4">
+                한글 입문부터 비즈니스 토론 과정까지 단절 없는 커리큘럼과 전문 튜터의 1:1 피드백을 통해 습득한 언어가 평생의 자산이 되도록 지원합니다.
+              </p>
+              <div class="flex gap-2">
+                <span class="px-3 py-1 bg-white text-xs font-bold text-brand-primary rounded-full border border-gray-200">#지속가능한성장</span>
+                <span class="px-3 py-1 bg-white text-xs font-bold text-brand-primary rounded-full border border-gray-200">#1대1밀착피드백</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- 3. 커리큘럼 페이지 -->
+    <div id="page-curriculum" class="page-content hidden">
+      <section class="py-20 bg-brand-dark text-white px-6">
+        <div class="max-w-7xl mx-auto">
+          <span class="text-xs font-bold text-brand-accent tracking-wider uppercase block mb-2">CURRICULUM TRACKS</span>
+          <h1 class="text-4xl sm:text-5xl font-black tracking-tighter mb-4">IEUM STUDY 커리큘럼</h1>
+          <p class="text-gray-300 font-light text-lg max-w-2xl">
+            영어 및 일본어 학습자의 언어적 배경을 고려해 설계된 체계적인 레벨별 코스입니다.
+          </p>
+        </div>
+      </section>
+
+      <section class="py-24 px-6 bg-white">
+        <div class="max-w-7xl mx-auto space-y-12">
+          <!-- LEVEL 01 -->
+          <div class="bg-brand-pale rounded-3xl p-10 border border-gray-100 shadow-sm">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-gray-200 pb-6 mb-8 gap-4">
+              <div>
+                <span class="text-xs font-bold text-brand-primary uppercase tracking-wider">LEVEL 01</span>
+                <h2 class="text-3xl font-black text-brand-dark mt-1">입문 & 기초 마스터 (Starter Path)</h2>
+              </div>
+              <div class="flex items-center space-x-3">
+                <span class="px-4 py-2 bg-brand-primary/10 text-brand-primary text-sm font-black rounded-full border border-brand-primary/20">$14.9 / Hour</span>
+                <span class="px-4 py-2 bg-brand-light text-brand-primary text-xs font-bold rounded-full">영어/일본어 대조 설명 지원</span>
+              </div>
+            </div>
+            <p class="text-gray-600 font-light text-sm mb-8">한글 자모음 발음 원리부터 기본 문장 구성까지, 모국어를 기준 삼아 가장 효율적으로 입문하는 트랙입니다.</p>
+            <div class="grid md:grid-cols-2 gap-6">
+              <div class="bg-white p-6 rounded-2xl border border-gray-100">
+                <span class="text-xs font-bold text-indigo-600 block mb-2">🇬🇧 English Speaker Module</span>
+                <h4 class="font-bold text-gray-900 mb-2">Structure & Phonetics</h4>
+                <ul class="text-xs text-gray-600 space-y-2 font-light">
+                  <li>• SVO vs SOV Word Order Contrast</li>
+                  <li>• Sound Mapping System</li>
+                  <li>• Basic Survival Phrases & Self-Introduction</li>
+                </ul>
+              </div>
+              <div class="bg-white p-6 rounded-2xl border border-gray-100">
+                <span class="text-xs font-bold text-rose-600 block mb-2">🇯🇵 日本語話者向けモジュール</span>
+                <h4 class="font-bold text-gray-900 mb-2">語順と助詞の活用</h4>
+                <ul class="text-xs text-gray-600 space-y-2 font-light">
+                  <li>• 共通するSOV語順を生かした高速文法 Master</li>
+                  <li>• 助詞（은/는, 이/가）のニュアンス比較</li>
+                  <li>• 日常で使えるハングル挨拶表現</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- LEVEL 02 -->
+          <div class="bg-brand-pale rounded-3xl p-10 border border-brand-primary/30 shadow-lg relative">
+            <span class="absolute -top-3 left-10 bg-brand-accent text-white text-xs px-4 py-1 rounded-full font-bold">RECOMMENDED</span>
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-gray-200 pb-6 mb-8 gap-4">
+              <div>
+                <span class="text-xs font-bold text-brand-primary uppercase tracking-wider">LEVEL 02</span>
+                <h2 class="text-3xl font-black text-brand-dark mt-1">초중급 실전 회화 (Intermediate Flow)</h2>
+              </div>
+              <div class="flex items-center space-x-3">
+                <span class="px-4 py-2 bg-brand-primary text-white text-sm font-black rounded-full shadow-sm">$19.9 / Hour</span>
+                <span class="px-4 py-2 bg-brand-primary text-white text-xs font-bold rounded-full">실전 문맥 다이얼로그</span>
+              </div>
+            </div>
+            <p class="text-gray-600 font-light text-sm mb-8">연결 어미와 복합 문장을 구사하며 일상 생활에서 정중하게 자기 생각을 표현하는 과정입니다.</p>
+            <div class="grid md:grid-cols-3 gap-6">
+              <div class="bg-white p-6 rounded-2xl border border-gray-100">
+                <h4 class="font-bold text-gray-900 mb-2">상황별 회화 실전</h4>
+                <p class="text-xs text-gray-500 font-light">식당 예약, 쇼핑, 길 묻기, 대중교통 이용 등 생활 필수 회화</p>
+              </div>
+              <div class="bg-white p-6 rounded-2xl border border-gray-100">
+                <h4 class="font-bold text-gray-900 mb-2">의견 & 감정 표현</h4>
+                <p class="text-xs text-gray-500 font-light">취향 설명, 정중한 거절, 이유 제시 및 경험 묘사 훈련</p>
+              </div>
+              <div class="bg-white p-6 rounded-2xl border border-gray-100">
+                <h4 class="font-bold text-gray-900 mb-2">존댓말 & 억양 교정</h4>
+                <p class="text-xs text-gray-500 font-light">상대방과의 관계에 따른 올바른 존댓말 및 발음 교정</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- LEVEL 03 -->
+          <div class="bg-brand-pale rounded-3xl p-10 border border-gray-100 shadow-sm">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-gray-200 pb-6 mb-8 gap-4">
+              <div>
+                <span class="text-xs font-bold text-brand-primary uppercase tracking-wider">LEVEL 03</span>
+                <h2 class="text-3xl font-black text-brand-dark mt-1">고급 & 비즈니스 (Advanced Biz)</h2>
+              </div>
+              <div class="flex items-center space-x-3">
+                <span class="px-4 py-2 bg-brand-primary/10 text-brand-primary text-sm font-black rounded-full border border-brand-primary/20">$29.9 / Hour</span>
+                <span class="px-4 py-2 bg-brand-light text-brand-primary text-xs font-bold rounded-full">전문 비즈니스 트랙</span>
+              </div>
+            </div>
+            <p class="text-gray-600 font-light text-sm mb-8">직장 내 이메일 작성, 회의 진행, 시사 토론 등 전문적인 수준의 커뮤니케이션을 다룹니다.</p>
+            <div class="grid md:grid-cols-2 gap-6">
+              <div class="bg-white p-6 rounded-2xl border border-gray-100">
+                <h4 class="font-bold text-gray-900 mb-2">비즈니스 커뮤니케이션</h4>
+                <p class="text-xs text-gray-500 font-light">격식체 이메일 작성법, 프레젠테이션, 미팅 매너 습득</p>
+              </div>
+              <div class="bg-white p-6 rounded-2xl border border-gray-100">
+                <h4 class="font-bold text-gray-900 mb-2">시사 이슈 토론</h4>
+                <p class="text-xs text-gray-500 font-light">한국 뉴스 기사와 칼럼을 활용하여 사회적 주제 논리적 토론</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- 4. 상담 신청 페이지 -->
+    <div id="page-apply" class="page-content hidden">
+      <section class="py-16 bg-brand-dark text-white px-6 text-center">
+        <div class="max-w-3xl mx-auto">
+          <span class="text-xs font-bold text-brand-accent tracking-wider uppercase block mb-2">FREE CONSULTATION</span>
+          <h1 class="text-4xl font-black mb-4">무료 1:1 레벨 진단 & 상담 신청</h1>
+          <p class="text-gray-300 font-light text-base">
+            신청서를 남겨주시면, 전문 언어 컨설턴트가 빠른 시일 내에 연락드립니다.
+          </p>
+        </div>
+      </section>
+
+      <section class="py-20 px-6 bg-brand-pale">
+        <div class="max-w-2xl mx-auto">
+          <form class="bg-white rounded-3xl p-10 shadow-xl border border-gray-100 space-y-6">
+            <div>
+              <label class="block text-xs font-bold text-gray-600 uppercase mb-2">성함 / Name</label>
+              <input type="text" placeholder="John Doe" class="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-primary transition">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-gray-600 uppercase mb-2">이메일 주소 / Email</label>
+              <input type="email" placeholder="example@email.com" class="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-primary transition">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-gray-600 uppercase mb-2">지원 언어 / Preferred Language</label>
+              <select class="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-primary transition bg-white text-gray-700">
+                <option>English (영어)</option>
+                <option>日本語 (일본어)</option>
+                <option>Both (둘 다 필요)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-gray-600 uppercase mb-2">현재 한국어 수준 / Current Level</label>
+              <select class="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-primary transition bg-white text-gray-700">
+                <option>전혀 못함 (Absolute Beginner)</option>
+                <option>한글 자모음 읽기 가능 (Basic Beginner)</option>
+                <option>기초 회화 가능 (Intermediate)</option>
+                <option>고급/비즈니스 한국어 희망 (Advanced)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-gray-600 uppercase mb-2">문의 사항 / Message</label>
+              <textarea rows="4" placeholder="학습 목적이나 추가 문의 사항을 자유롭게 남겨주세요." class="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-primary transition"></textarea>
+            </div>
+
+            <button type="button" onclick="alert('상담 신청이 완료되었습니다.');" class="w-full bg-brand-primary hover:bg-brand-dark text-white py-4 rounded-xl font-bold text-lg transition shadow-lg">
+              상담 신청하기
+            </button>
+          </form>
+        </div>
+      </section>
+    </div>
+
+    <!-- 5. B2B 제휴 문의 페이지 -->
+    <div id="page-b2b" class="page-content hidden">
+      <section class="py-16 bg-brand-dark text-white px-6 text-center">
+        <div class="max-w-3xl mx-auto">
+          <span class="text-xs font-bold text-brand-accent tracking-wider uppercase block mb-2">B2B PARTNERSHIP</span>
+          <h1 class="text-4xl font-black mb-4">기업 및 교육기관 제휴 문의</h1>
+          <p class="text-gray-300 font-light text-base">
+            유학원, 해외 교육기관, 글로벌 기업 임직원 대상 맞춤형 한국어 위탁 교육 프로그램 및 얼라이언스 제안을 환영합니다.
+          </p>
+        </div>
+      </section>
+
+      <section class="py-16 px-6 bg-white">
+        <div class="max-w-7xl mx-auto grid md:grid-cols-3 gap-8 mb-16">
+          <div class="bg-brand-pale p-8 rounded-2xl border border-gray-100">
+            <div class="text-3xl mb-3">🏢</div>
+            <h3 class="text-xl font-bold mb-2">맞춤 커리큘럼 설계</h3>
+            <p class="text-sm text-gray-600 font-light">기관 및 기업의 목적(비즈니스, 학술, 문화체험 등)에 맞춰 전용 모듈과 교재를 커스터마이징합니다.</p>
+          </div>
+          <div class="bg-brand-pale p-8 rounded-2xl border border-gray-100">
+            <div class="text-3xl mb-3">📊</div>
+            <h3 class="text-xl font-bold mb-2">학습 성과 관리</h3>
+            <p class="text-sm text-gray-600 font-light">출결 현황, 성취도 리포트, 1:1 피드백 데이터를 정기적으로 파트너 기관에 제공합니다.</p>
+          </div>
+          <div class="bg-brand-pale p-8 rounded-2xl border border-gray-100">
+            <div class="text-3xl mb-3">🤝</div>
+            <h3 class="text-xl font-bold mb-2">제휴 단가 & 혜택</h3>
+            <p class="text-sm text-gray-600 font-light">단체 수강 할인, 수료증 발급, 비즈니스 매너 세미나 무료 지원 등 전략적 파트너 혜택을 제공합니다.</p>
+          </div>
+        </div>
+
+        <div class="max-w-2xl mx-auto">
+          <form class="bg-white rounded-3xl p-10 shadow-xl border border-gray-100 space-y-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-xs font-bold text-gray-600 uppercase mb-2">기업/기관명 / Organization Name</label>
+                <input type="text" placeholder="OO 유학원 / OO 기업" class="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-primary transition">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-gray-600 uppercase mb-2">담당자 성함 및 직급 / Contact Person</label>
+                <input type="text" placeholder="홍길동 팀장" class="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-primary transition">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-xs font-bold text-gray-600 uppercase mb-2">이메일 주소 / Email</label>
+                <input type="email" placeholder="contact@company.com" class="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-primary transition">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-gray-600 uppercase mb-2">연락처 / Phone</label>
+                <input type="tel" placeholder="+82 10-0000-0000" class="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-primary transition">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-gray-600 uppercase mb-2">제휴 유형 / Partnership Type</label>
+              <select class="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-primary transition bg-white text-gray-700">
+                <option>유학원 / 어학연수 기관 제휴</option>
+                <option>기업 임직원 한국어 위탁 교육</option>
+                <option>글로벌 교환학생 지원 제휴</option>
+                <option>기타 제안</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-gray-600 uppercase mb-2">예상 수강 인원 / Estimated Learners</label>
+              <select class="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-primary transition bg-white text-gray-700">
+                <option>5명 미만</option>
+                <option>5명 ~ 15명</option>
+                <option>16명 ~ 50명</option>
+                <option>50명 이상</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-gray-600 uppercase mb-2">제안 및 문의 내용 / Proposal Details</label>
+              <textarea rows="4" placeholder="협력하고자 하는 내용이나 세부 요구사항을 작성해주세요." class="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-primary transition"></textarea>
+            </div>
+
+            <button type="button" onclick="alert('B2B 제휴 문의가 접수되었습니다. 담당자가 제안서 검토 후 연락드리겠습니다.');" class="w-full bg-brand-primary hover:bg-brand-dark text-white py-4 rounded-xl font-bold text-lg transition shadow-lg">
+              B2B 제휴 제안 제출하기
+            </button>
+          </form>
+        </div>
+      </section>
+    </div>
+
+  </main>
+
+  <!-- 공통 푸터 -->
+  <footer class="py-12 bg-white text-center text-sm border-t border-gray-100 text-gray-500">
+    <p class="font-bold text-brand-dark text-lg mb-1">IEUM STUDY</p>
+    <p>© 2026 IEUM STUDY. All rights reserved.</p>
+  </footer>
+
+  <!-- 페이지 전환 탭 JavaScript -->
+  <script>
+    function switchTab(tabId) {
+      // 1. 모든 페이지 숨기기
+      const pages = document.querySelectorAll('.page-content');
+      pages.forEach(page => page.classList.add('hidden'));
+
+      // 2. 선택된 페이지 보이기
+      const targetPage = document.getElementById('page-' + tabId);
+      if (targetPage) {
+        targetPage.classList.remove('hidden');
+      }
+
+      // 3. 네비게이션 스타일 업데이트
+      const navButtons = document.querySelectorAll('.nav-btn');
+      navButtons.forEach(btn => {
+        btn.classList.remove('text-brand-primary', 'font-bold', 'border-b-2', 'border-brand-primary');
+        btn.classList.add('hover:text-brand-primary');
+      });
+
+      const activeNav = document.getElementById('nav-' + tabId);
+      if (activeNav) {
+        activeNav.classList.add('text-brand-primary', 'font-bold', 'border-b-2', 'border-brand-primary');
+        activeNav.classList.remove('hover:text-brand-primary');
+      }
+
+      // 4. 화면 맨 위로 이동
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
