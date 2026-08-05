@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IEUM 관리자 페이지</title>
+<style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif; }
+    body { background:#f8fafc; color:#0f172a; line-height:1.6; min-height:100vh; }
+
+    /* ---------- 로그인 화면 ---------- */
+    #login-screen { min-height:100vh; display:flex; align-items:center; justify-content:center; background:#0f172a; }
+    .login-box { background:#ffffff; padding:2.8rem 2.4rem; border-radius:18px; width:100%; max-width:360px; box-shadow:0 20px 40px rgba(0,0,0,0.25); }
+    .login-box .logo { font-size:1.5rem; font-weight:900; color:#2563eb; letter-spacing:-0.5px; margin-bottom:0.3rem; }
+    .login-box .sub { color:#64748b; font-size:0.85rem; margin-bottom:1.8rem; }
+    .login-box label { display:block; font-size:0.82rem; font-weight:600; color:#334155; margin-bottom:0.4rem; }
+    .login-box input { width:100%; padding:0.75rem 0.9rem; border:1px solid #e2e8f0; border-radius:10px; font-size:0.95rem; margin-bottom:1.1rem; outline:none; }
+    .login-box input:focus { border-color:#2563eb; }
+    .login-box button { width:100%; padding:0.8rem; background:#2563eb; color:#fff; border:none; border-radius:10px; font-weight:700; font-size:0.95rem; cursor:pointer; }
+    .login-box button:hover { background:#1d4ed8; }
+    .login-hint { margin-top:1rem; font-size:0.76rem; color:#94a3b8; text-align:center; line-height:1.5; }
+    .login-error { color:#dc2626; font-size:0.8rem; margin-bottom:0.8rem; display:none; }
+
+    /* ---------- 관리자 레이아웃 ---------- */
+    #admin-app { display:none; min-height:100vh; }
+    .admin-shell { display:flex; min-height:100vh; }
+
+    .sidebar { width:230px; background:#0f172a; color:#cbd5e1; flex-shrink:0; display:flex; flex-direction:column; }
+    .sidebar .brand { padding:1.6rem 1.4rem; font-size:1.25rem; font-weight:900; color:#fff; letter-spacing:-0.5px; border-bottom:1px solid rgba(255,255,255,0.08); }
+    .sidebar .brand span { color:#60a5fa; }
+    .nav-list { list-style:none; padding:1rem 0.8rem; flex:1; }
+    .nav-list li { margin-bottom:0.3rem; }
+    .nav-list a { display:flex; align-items:center; gap:0.6rem; padding:0.7rem 0.9rem; border-radius:10px; color:#cbd5e1; text-decoration:none; font-size:0.9rem; font-weight:600; cursor:pointer; transition:0.15s; }
+    .nav-list a:hover { background:rgba(255,255,255,0.06); color:#fff; }
+    .nav-list a.active { background:#2563eb; color:#fff; }
+    .sidebar-footer { padding:1rem 1.4rem; border-top:1px solid rgba(255,255,255,0.08); }
+    .logout-btn { width:100%; padding:0.6rem; background:transparent; border:1px solid rgba(255,255,255,0.15); color:#cbd5e1; border-radius:8px; font-size:0.82rem; cursor:pointer; }
+    .logout-btn:hover { background:rgba(255,255,255,0.08); color:#fff; }
+
+    .main-area { flex:1; display:flex; flex-direction:column; min-width:0; }
+    .topbar { background:#fff; border-bottom:1px solid #e2e8f0; padding:1.1rem 2rem; display:flex; justify-content:space-between; align-items:center; }
+    .topbar h1 { font-size:1.15rem; font-weight:800; }
+    .topbar .desc { font-size:0.82rem; color:#64748b; margin-top:0.15rem; }
+    .demo-badge { background:#fef3c7; color:#92400e; font-size:0.72rem; font-weight:700; padding:0.35rem 0.7rem; border-radius:999px; }
+
+    .content { padding:2rem; flex:1; overflow-y:auto; }
+    .view { display:none; }
+    .view.active { display:block; }
+
+    /* ---------- 공통 카드/버튼 ---------- */
+    .stat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:1rem; margin-bottom:2rem; }
+    .stat-card { background:#fff; border:1px solid #e2e8f0; border-radius:16px; padding:1.4rem; }
+    .stat-card .num { font-size:1.8rem; font-weight:900; color:#0f172a; }
+    .stat-card .label { font-size:0.82rem; color:#64748b; margin-top:0.2rem; }
+
+    .panel { background:#fff; border:1px solid #e2e8f0; border-radius:16px; padding:1.6rem; margin-bottom:1.5rem; }
+    .panel-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.2rem; flex-wrap:wrap; gap:0.8rem; }
+    .panel-head h2 { font-size:1.05rem; font-weight:800; }
+    .panel-head .sub { font-size:0.8rem; color:#64748b; margin-top:0.2rem; }
+
+    .btn { padding:0.6rem 1.1rem; border-radius:9px; font-size:0.85rem; font-weight:700; cursor:pointer; border:1px solid transparent; }
+    .btn-primary { background:#2563eb; color:#fff; }
+    .btn-primary:hover { background:#1d4ed8; }
+    .btn-outline { background:#fff; color:#334155; border-color:#e2e8f0; }
+    .btn-outline:hover { border-color:#cbd5e1; }
+    .btn-danger { background:#fff; color:#dc2626; border-color:#fecaca; }
+    .btn-danger:hover { background:#fef2f2; }
+    .btn-sm { padding:0.4rem 0.75rem; font-size:0.78rem; }
+
+    .filter-row { display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1.2rem; }
+    .filter-chip { padding:0.4rem 0.9rem; border-radius:999px; border:1px solid #e2e8f0; background:#fff; font-size:0.8rem; font-weight:600; color:#475569; cursor:pointer; }
+    .filter-chip.active { background:#eff6ff; border-color:#93c5fd; color:#2563eb; }
+
+    table { width:100%; border-collapse:collapse; }
+    th, td { text-align:left; padding:0.85rem 0.7rem; border-bottom:1px solid #f1f5f9; font-size:0.86rem; vertical-align:top; }
+    th { color:#64748b; font-weight:700; font-size:0.78rem; text-transform:uppercase; letter-spacing:0.02em; }
+    tr:hover td { background:#f8fafc; }
+    .empty-row td { text-align:center; color:#94a3b8; padding:2.5rem 1rem; }
+
+    .badge { display:inline-block; padding:0.28rem 0.6rem; border-radius:999px; font-size:0.74rem; font-weight:700; }
+    .badge-new { background:#dbeafe; color:#1d4ed8; }
+    .badge-progress { background:#fef3c7; color:#92400e; }
+    .badge-done { background:#dcfce7; color:#15803d; }
+
+    .status-select { border:1px solid #e2e8f0; border-radius:7px; padding:0.35rem 0.5rem; font-size:0.8rem; font-weight:600; color:#334155; background:#fff; cursor:pointer; }
+
+    .msg-cell { max-width:260px; color:#475569; }
+    .msg-cell .more { color:#2563eb; font-size:0.78rem; cursor:pointer; font-weight:600; }
+
+    .card-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:1rem; }
+    .item-card { border:1px solid #e2e8f0; border-radius:14px; padding:1.1rem; background:#fbfcfe; }
+    .item-card .row-top { display:flex; justify-content:space-between; align-items:flex-start; gap:0.6rem; }
+    .item-card .icon { font-size:1.4rem; }
+    .item-card h3 { font-size:0.95rem; font-weight:800; margin:0.5rem 0 0.3rem; }
+    .item-card .tag-label { font-size:0.72rem; color:#2563eb; font-weight:700; }
+    .item-card p { font-size:0.82rem; color:#64748b; margin:0.4rem 0 0.7rem; }
+    .item-card .tags { display:flex; gap:0.35rem; flex-wrap:wrap; margin-bottom:0.8rem; }
+    .item-card .tags span { background:#eff6ff; color:#2563eb; font-size:0.7rem; padding:0.2rem 0.5rem; border-radius:6px; font-weight:600; }
+    .item-card .actions { display:flex; gap:0.4rem; }
+
+    .faq-group { margin-bottom:1.4rem; }
+    .faq-group h3 { font-size:0.88rem; font-weight:800; color:#334155; margin-bottom:0.6rem; }
+    .faq-row { border:1px solid #e2e8f0; border-radius:12px; padding:0.9rem 1rem; margin-bottom:0.6rem; }
+    .faq-row .q { font-weight:700; font-size:0.88rem; margin-bottom:0.3rem; }
+    .faq-row .a { font-size:0.82rem; color:#64748b; margin-bottom:0.6rem; }
+    .faq-row .actions { display:flex; gap:0.4rem; }
+
+    /* ---------- 모달 ---------- */
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(15,23,42,0.5); align-items:center; justify-content:center; z-index:2000; padding:1rem; }
+    .modal-overlay.active { display:flex; }
+    .modal-box { background:#fff; border-radius:16px; width:100%; max-width:480px; max-height:88vh; overflow-y:auto; padding:1.6rem; }
+    .modal-box h3 { font-size:1.05rem; font-weight:800; margin-bottom:1.1rem; }
+    .form-group { margin-bottom:0.9rem; }
+    .form-group label { display:block; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:0.35rem; }
+    .form-group input, .form-group select, .form-group textarea {
+        width:100%; padding:0.6rem 0.75rem; border:1px solid #e2e8f0; border-radius:8px; font-size:0.86rem; outline:none;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color:#2563eb; }
+    .form-group textarea { min-height:80px; resize:vertical; }
+    .modal-actions { display:flex; gap:0.6rem; justify-content:flex-end; margin-top:1.2rem; }
+
+    @media (max-width: 860px) {
+        .sidebar { position:fixed; left:0; top:0; bottom:0; transform:translateX(-100%); transition:0.2s; z-index:1500; }
+        .sidebar.open { transform:translateX(0); }
+        .content { padding:1.2rem; }
+    }
+</style>
+</head>
+<body>
+
+<!-- ================= 로그인 화면 ================= -->
+<div id="login-screen">
+    <div class="login-box">
+        <div class="logo">IEUM <span style="color:#0f172a;">Admin</span></div>
+        <div class="sub">관리자 계정으로 로그인해 주세요.</div>
+        <div class="login-error" id="login-error">아이디 또는 비밀번호가 올바르지 않습니다.</div>
+        <form onsubmit="handleLogin(event)">
+            <label for="admin-id">아이디</label>
+            <input type="text" id="admin-id" placeholder="admin" autocomplete="username" required>
+            <label for="admin-pw">비밀번호</label>
+            <input type="password" id="admin-pw" placeholder="••••••••" autocomplete="current-password" required>
+            <button type="submit">로그인</button>
+        </form>
+        <div class="login-hint">데모 계정 — 아이디 <b>admin</b> / 비밀번호 <b>ieum2026</b><br>※ 프론트엔드 데모용 로그인으로, 실제 서비스 배포 시에는 서버 기반 인증으로 반드시 교체해야 합니다.</div>
+    </div>
+</div>
+
+<!-- ================= 관리자 화면 ================= -->
+<div id="admin-app">
+<div class="admin-shell">
+    <aside class="sidebar">
+        <div class="brand">IEUM <span>Admin</span></div>
+        <ul class="nav-list">
+            <li><a class="nav-link active" data-view="dashboard" onclick="switchView('dashboard')">📊 대시보드</a></li>
+            <li><a class="nav-link" data-view="inquiries" onclick="switchView('inquiries')">📥 문의 내역 관리</a></li>
+            <li><a class="nav-link" data-view="services" onclick="switchView('services')">🧩 서비스 콘텐츠 관리</a></li>
+            <li><a class="nav-link" data-view="faqs" onclick="switchView('faqs')">❓ FAQ 관리</a></li>
+            <li><a class="nav-link" data-view="posts" onclick="switchView('posts')">📝 프로모션 · 네트워킹</a></li>
+            <li><a class="nav-link" data-view="analytics" onclick="switchView('analytics')">📈 방문자 통계</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <button class="logout-btn" onclick="handleLogout()">로그아웃</button>
+        </div>
+    </aside>
+
+    <div class="main-area">
+        <div class="topbar">
+            <div>
+                <h1 id="topbar-title">대시보드</h1>
+                <div class="desc" id="topbar-desc">IEUM 웹사이트 현황을 한눈에 확인하세요.</div>
+            </div>
+            <span class="demo-badge">DEMO · 브라우저 로컬 저장</span>
+        </div>
+
+        <div class="content">
+
+            <!-- ---------- 대시보드 ---------- -->
+            <section class="view active" id="view-dashboard">
+                <div class="stat-grid">
+                    <div class="stat-card"><div class="num" id="stat-total">0</div><div class="label">전체 문의</div></div>
+                    <div class="stat-card"><div class="num" id="stat-new">0</div><div class="label">신규 문의</div></div>
+                    <div class="stat-card"><div class="num" id="stat-services">0</div><div class="label">등록된 서비스</div></div>
+                    <div class="stat-card"><div class="num" id="stat-faqs">0</div><div class="label">등록된 FAQ</div></div>
+                    <div class="stat-card"><div class="num" id="stat-promo">0</div><div class="label">프로모션 게시글</div></div>
+                    <div class="stat-card"><div class="num" id="stat-networking">0</div><div class="label">네트워킹 게시글</div></div>
+                </div>
+                <div class="panel">
+                    <div class="panel-head">
+                        <div><h2>최근 문의 5건</h2><div class="sub">홈페이지 1:1 문의 폼을 통해 접수된 최신 내역입니다.</div></div>
+                        <button class="btn btn-outline btn-sm" onclick="switchView('inquiries')">전체 보기 →</button>
+                    </div>
+                    <table>
+                        <thead><tr><th>접수일</th><th>이름</th><th>유형</th><th>상태</th></tr></thead>
+                        <tbody id="recent-inquiries-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ---------- 문의 내역 관리 ---------- -->
+            <section class="view" id="view-inquiries">
+                <div class="panel">
+                    <div class="panel-head">
+                        <div><h2>1:1 문의 내역</h2><div class="sub">홈페이지 고객센터 폼을 통해 접수된 문의를 관리합니다.</div></div>
+                        <div style="display:flex; gap:0.5rem;">
+                            <button class="btn btn-outline btn-sm" onclick="seedSampleInquiries()">샘플 데이터 추가</button>
+                            <button class="btn btn-danger btn-sm" onclick="clearAllInquiries()">전체 삭제</button>
+                        </div>
+                    </div>
+                    <div class="filter-row" id="inquiry-filter-row"></div>
+                    <table>
+                        <thead>
+                            <tr><th>접수일</th><th>이름</th><th>연락처</th><th>유형</th><th>내용</th><th>상태</th><th></th></tr>
+                        </thead>
+                        <tbody id="inquiries-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ---------- 서비스 콘텐츠 관리 ---------- -->
+            <section class="view" id="view-services">
+                <div class="panel">
+                    <div class="panel-head">
+                        <div><h2>서비스 소개 카드</h2><div class="sub">서비스 소개 페이지에 노출되는 카드 내용을 관리합니다. (변경 사항은 이 관리자 페이지 내 데이터에만 저장되며, 실제 홈페이지에 즉시 반영하려면 개발 반영이 필요합니다.)</div></div>
+                        <button class="btn btn-primary btn-sm" onclick="openServiceModal()">+ 새 서비스 추가</button>
+                    </div>
+                    <div class="card-grid" id="services-grid"></div>
+                </div>
+            </section>
+
+            <!-- ---------- FAQ 관리 ---------- -->
+            <section class="view" id="view-faqs">
+                <div class="panel">
+                    <div class="panel-head">
+                        <div><h2>자주 묻는 질문</h2><div class="sub">고객센터 페이지의 FAQ 문항을 카테고리별로 관리합니다.</div></div>
+                        <button class="btn btn-primary btn-sm" onclick="openFaqModal()">+ 새 FAQ 추가</button>
+                    </div>
+                    <div id="faqs-container"></div>
+                </div>
+            </section>
+
+            <!-- ---------- 프로모션 · 네트워킹 게시글 관리 ---------- -->
+            <section class="view" id="view-posts">
+                <div class="panel">
+                    <div class="panel-head">
+                        <div><h2>게시글 관리</h2><div class="sub">홈페이지 커뮤니티 메뉴의 프로모션 · 네트워킹 페이지에 노출되는 글을 작성/관리합니다.</div></div>
+                        <button class="btn btn-primary btn-sm" onclick="openPostModal()">+ 새 글 작성</button>
+                    </div>
+                    <div class="filter-row" id="post-type-tabs"></div>
+                    <div class="card-grid" id="posts-grid"></div>
+                </div>
+            </section>
+
+            <!-- ---------- 방문자 통계 ---------- -->
+            <section class="view" id="view-analytics">
+                <div class="panel" style="background:#fffbeb; border-color:#fde68a;">
+                    <div style="font-size:0.82rem; color:#92400e; line-height:1.6;">
+                        ⚠️ 이 통계는 <b>이 브라우저에서 직접 접속·클릭한 기록만</b> 집계됩니다. 서버가 없는 데모 환경이라 실제 여러 사용자의 방문 데이터를 종합해서 보여줄 수는 없어요. 실제 서비스에서는 Google Analytics(GA4) 등 외부 분석 도구 연동을 권장합니다.
+                    </div>
+                </div>
+
+                <div class="stat-grid">
+                    <div class="stat-card"><div class="num" id="an-total-sessions">0</div><div class="label">총 방문 세션</div></div>
+                    <div class="stat-card"><div class="num" id="an-today-sessions">0</div><div class="label">오늘 방문 세션</div></div>
+                    <div class="stat-card"><div class="num" id="an-avg-duration">0분 0초</div><div class="label">평균 체류 시간</div></div>
+                    <div class="stat-card"><div class="num" id="an-total-clicks">0</div><div class="label">총 클릭 수</div></div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-head">
+                        <div><h2>페이지별 조회수</h2><div class="sub">어떤 페이지가 많이 열람되었는지 확인하세요.</div></div>
+                    </div>
+                    <table>
+                        <thead><tr><th>페이지</th><th>조회수</th></tr></thead>
+                        <tbody id="an-pageviews-body"></tbody>
+                    </table>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-head">
+                        <div><h2>서비스 클릭 순위</h2><div class="sub">어떤 서비스 카드가 가장 많이 클릭되었는지 확인하세요.</div></div>
+                    </div>
+                    <table>
+                        <thead><tr><th>서비스 / 항목</th><th>클릭수</th></tr></thead>
+                        <tbody id="an-clicks-body"></tbody>
+                    </table>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-head">
+                        <div><h2>최근 방문 세션</h2><div class="sub">최근 접속한 세션의 체류 시간을 확인하세요.</div></div>
+                        <button class="btn btn-danger btn-sm" onclick="clearAnalytics()">통계 초기화</button>
+                    </div>
+                    <table>
+                        <thead><tr><th>접속 시각</th><th>마지막 활동</th><th>체류 시간</th></tr></thead>
+                        <tbody id="an-sessions-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- ================= 문의 상세 모달 ================= -->
+<div class="modal-overlay" id="inquiry-modal">
+    <div class="modal-box">
+        <h3>문의 상세</h3>
+        <div id="inquiry-detail-body" style="font-size:0.88rem; color:#334155; line-height:1.8;"></div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('inquiry-modal')">닫기</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================= 서비스 추가/수정 모달 ================= -->
+<div class="modal-overlay" id="service-modal">
+    <div class="modal-box">
+        <h3 id="service-modal-title">새 서비스 추가</h3>
+        <input type="hidden" id="service-edit-id">
+        <div class="form-group"><label>아이콘 (이모지)</label><input type="text" id="service-icon" placeholder="⚖️" maxlength="4"></div>
+        <div class="form-group"><label>영문 배지</label><input type="text" id="service-badge" placeholder="Legal Support"></div>
+        <div class="form-group"><label>제목</label><input type="text" id="service-title" placeholder="법률 행정 지원"></div>
+        <div class="form-group"><label>설명</label><textarea id="service-desc" placeholder="서비스에 대한 설명을 입력하세요."></textarea></div>
+        <div class="form-group"><label>태그 (쉼표로 구분, 최대 3개)</label><input type="text" id="service-tags" placeholder="법률자문, 계약서검토, 노동분쟁"></div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('service-modal')">취소</button>
+            <button class="btn btn-primary" onclick="saveService()">저장</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================= FAQ 추가/수정 모달 ================= -->
+<div class="modal-overlay" id="faq-modal">
+    <div class="modal-box">
+        <h3 id="faq-modal-title">새 FAQ 추가</h3>
+        <input type="hidden" id="faq-edit-id">
+        <div class="form-group">
+            <label>카테고리</label>
+            <select id="faq-category">
+                <option value="visa">비자 / 행정</option>
+                <option value="telecom">통신 / 개통</option>
+                <option value="living">주거 / 의료</option>
+                <option value="concierge">1:1 컨시어지</option>
+            </select>
+        </div>
+        <div class="form-group"><label>질문</label><input type="text" id="faq-question" placeholder="Q. 질문을 입력하세요"></div>
+        <div class="form-group"><label>답변</label><textarea id="faq-answer" placeholder="답변 내용을 입력하세요."></textarea></div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('faq-modal')">취소</button>
+            <button class="btn btn-primary" onclick="saveFaq()">저장</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================= 게시글 작성/수정 모달 ================= -->
+<div class="modal-overlay" id="post-modal">
+    <div class="modal-box">
+        <h3 id="post-modal-title">새 글 작성</h3>
+        <input type="hidden" id="post-edit-id">
+        <div class="form-group">
+            <label>게시 위치</label>
+            <select id="post-type">
+                <option value="promo">프로모션</option>
+                <option value="networking">네트워킹</option>
+            </select>
+        </div>
+        <div class="form-group"><label>아이콘 (이모지)</label><input type="text" id="post-icon" placeholder="🎁" maxlength="4"></div>
+        <div class="form-group"><label>제목</label><input type="text" id="post-title" placeholder="글 제목을 입력하세요"></div>
+        <div class="form-group"><label>상태/기간 태그 (선택)</label><input type="text" id="post-tag" placeholder="예: ~8/31까지 · 모집중 · 선착순 30명"></div>
+        <div class="form-group"><label>요약</label><input type="text" id="post-summary" placeholder="목록에 보여질 한 줄 요약"></div>
+        <div class="form-group"><label>본문 내용</label><textarea id="post-content" placeholder="상세 내용을 입력하세요." style="min-height:120px;"></textarea></div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('post-modal')">취소</button>
+            <button class="btn btn-primary" onclick="savePost()">저장</button>
+        </div>
+    </div>
+</div>
+
+<script>
+/* ============================================================
+   IEUM Admin — 데모용 관리자 페이지
+   - 별도 백엔드가 없으므로 모든 데이터는 브라우저 localStorage에 저장됩니다.
+   - 홈페이지(ieum-homepage.html)와 같은 서버/경로에서 열어야
+     1:1 문의 폼으로 접수된 데이터가 이 페이지에도 함께 표시됩니다.
+   ============================================================ */
+
+const LS_KEYS = { inquiries:'ieum_inquiries', services:'ieum_services', faqs:'ieum_faqs', posts:'ieum_posts' };
+
+const CATEGORY_LABEL = {
+    legal:'비자 및 행정', visa:'비자 / 행정', telecom:'통신 / 인터넷', housing:'부동산 / 주거',
+    living:'주거 / 의료', medical:'의료 통역', concierge:'1:1 컨시어지', law:'법률 상담', other:'기타'
+};
+
+/* ---------------- 로그인 ---------------- */
+function handleLogin(e){
+    e.preventDefault();
+    const id = document.getElementById('admin-id').value.trim();
+    const pw = document.getElementById('admin-pw').value;
+    if(id === 'admin' && pw === 'ieum2026'){
+        sessionStorage.setItem('ieum_admin_logged_in', '1');
+        document.getElementById('login-error').style.display = 'none';
+        showAdminApp();
+    } else {
+        document.getElementById('login-error').style.display = 'block';
+    }
+}
+function handleLogout(){
+    sessionStorage.removeItem('ieum_admin_logged_in');
+    document.getElementById('admin-app').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'flex';
+}
+function showAdminApp(){
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('admin-app').style.display = 'block';
+    initData();
+    renderAll();
+}
+if(sessionStorage.getItem('ieum_admin_logged_in') === '1'){ showAdminApp(); }
+
+/* ---------------- 뷰 전환 ---------------- */
+const VIEW_META = {
+    dashboard:{title:'대시보드', desc:'IEUM 웹사이트 현황을 한눈에 확인하세요.'},
+    inquiries:{title:'문의 내역 관리', desc:'홈페이지를 통해 접수된 1:1 문의를 확인하고 처리 상태를 관리하세요.'},
+    services:{title:'서비스 콘텐츠 관리', desc:'서비스 소개 페이지에 노출되는 카드를 관리하세요.'},
+    faqs:{title:'FAQ 관리', desc:'고객센터 페이지의 자주 묻는 질문을 관리하세요.'},
+    posts:{title:'프로모션 · 네트워킹', desc:'커뮤니티 메뉴의 프로모션 · 네트워킹 페이지에 노출되는 글을 관리하세요.'},
+    analytics:{title:'방문자 통계', desc:'홈페이지 방문·체류·클릭 데이터를 확인하세요. (이 브라우저 기준 데모 데이터)'}
+};
+function switchView(view){
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.getElementById('view-'+view).classList.add('active');
+    document.querySelectorAll('.nav-link').forEach(a=>a.classList.remove('active'));
+    document.querySelector('.nav-link[data-view="'+view+'"]').classList.add('active');
+    document.getElementById('topbar-title').textContent = VIEW_META[view].title;
+    document.getElementById('topbar-desc').textContent = VIEW_META[view].desc;
+    if (view === 'analytics') renderAnalytics();
+}
+
+/* ---------------- 데이터 초기화(시드) ---------------- */
+function initData(){
+    if(!localStorage.getItem(LS_KEYS.inquiries)){
+        localStorage.setItem(LS_KEYS.inquiries, JSON.stringify([]));
+    }
+    if(!localStorage.getItem(LS_KEYS.services)){
+        const seedServices = [
+            {id:'visa', icon:'🛂', badge:'Visa & Immigration', title:'비자 행정 지원', desc:'외국인 등록증 발급, 비자 연장 및 자격 변경 등 정착 행정 서류에 대한 전문 자문 및 안내를 지원합니다.', tags:['외국인등록증','비자연장','행정서류']},
+            {id:'law', icon:'⚖️', badge:'Legal Support', title:'법률 행정 지원', desc:'임금 체불, 계약서 검토, 각종 생활 법률 분쟁까지 전문 변호사 및 법무 파트너와 연계하여 지원합니다.', tags:['법률자문','계약서검토','노동분쟁']},
+            {id:'telecom', icon:'📱', badge:'Telecom & Mobile', title:'통신 및 선불/알뜰폰 개통', desc:'여권 및 외국인등록증으로 신속하게 개통 가능한 알뜰폰 SIM 카드 및 초고속 인터넷 설치를 안내합니다.', tags:['선불SIM','알뜰폰','초고속인터넷']},
+            {id:'medical', icon:'🏥', badge:'Medical Care', title:'의료 기관 예약 및 통역', desc:'종합병원 및 대학병원 예약, 증상 번역 및 의료 현장 동행 통역을 제공합니다.', tags:['대학병원예약','의료통역','건강검진']},
+            {id:'housing', icon:'🏡', badge:'Housing & Moving', title:'부동산 및 주거 안심 케어', desc:'외국인 단기/장기 원룸, 기숙사, 오피스텔 매물 안내 및 안전한 전월세 계약 검토를 지원합니다.', tags:['원룸계약','보증금보호','이사지원']},
+            {id:'travel', icon:'✈️', badge:'Travel & Experience', title:'한국 문화 및 프라이빗 투어', desc:'K-컬처 체험, 전국 주요 관광지 맞춤 프라이빗 차량 투어 및 문화 가이드를 제공합니다.', tags:['K컬처','맞춤투어','프라이빗차량']},
+            {id:'career', icon:'💼', badge:'Career & Jobs', title:'외국인 전문 취업 및 아르바이트', desc:'합법적 비자 기준을 준수하는 외국인 맞춤 채용 정보, 이력서 컨설팅, 면접 매칭을 연결해 드립니다.', tags:['외국인채용','알바정보','취업비자']},
+            {id:'concierge', icon:'🤝', badge:'Premium 1:1 Concierge', title:'노벨리움 1:1 프리미엄 동행 컨시어지', desc:'은행 계좌 개설, 관공서 방문, 병원 진료, 부동산 계약까지 전문 매니저가 현장에 직접 동행합니다.', tags:['현장동행','전담매니저','정찰제요금']}
+        ];
+        localStorage.setItem(LS_KEYS.services, JSON.stringify(seedServices));
+    }
+    if(!localStorage.getItem(LS_KEYS.faqs)){
+        const seedFaqs = [
+            {id:'f1', category:'visa', q:'외국인등록증(ARC) 발급 신청 지원은 어떻게 진행되나요?', a:'입국 후 필요 서류 준비부터 출입국관리사무소 방문 예약, 신청서 작성 검토까지 가이드를 제공합니다. 1:1 동행 서비스 이용 시 매니저가 현장에 직접 동행합니다.'},
+            {id:'f2', category:'telecom', q:'여권만으로 알뜰폰 SIM 카드 개통이 가능한가요?', a:'네, 여권 제출만으로 즉시 사용 가능한 선불/알뜰폰 SIM 개통이 가능합니다. 추후 외국인등록증이 발급되면 명의 교체 처리도 도움을 드립니다.'},
+            {id:'f3', category:'living', q:'한국어가 서툰데 부동산 전월세 계약이 안전할까요?', a:'검증된 파트너 공인중개사를 연결해 드리며, 계약서 특약사항 및 보증금 보호 절차(확정일자 등)를 꼼꼼히 점검해 드립니다.'},
+            {id:'f4', category:'concierge', q:'1:1 컨시어지 서비스 신청 및 비용은 어떻게 되나요?', a:'은행 계좌 개설, 병원 진료 동행 등 현장 동행 케어가 필요할 때 전용 페이지를 통해 신청하실 수 있으며, 정찰제 수수료로 안내됩니다.'}
+        ];
+        localStorage.setItem(LS_KEYS.faqs, JSON.stringify(seedFaqs));
+    }
+    if(!localStorage.getItem(LS_KEYS.posts)){
+        localStorage.setItem(LS_KEYS.posts, JSON.stringify([]));
+    }
+}
+function getData(key){ return JSON.parse(localStorage.getItem(key) || '[]'); }
+function setData(key, arr){ localStorage.setItem(key, JSON.stringify(arr)); }
+
+/* ---------------- 렌더 총괄 ---------------- */
+let activeInquiryFilter = 'all';
+let activePostType = 'promo';
+function renderAll(){
+    renderDashboard();
+    renderInquiries();
+    renderServices();
+    renderFaqs();
+    renderPosts();
+}
+
+/* ---------------- 대시보드 ---------------- */
+function renderDashboard(){
+    const inquiries = getData(LS_KEYS.inquiries);
+    const services = getData(LS_KEYS.services);
+    const faqs = getData(LS_KEYS.faqs);
+    document.getElementById('stat-total').textContent = inquiries.length;
+    document.getElementById('stat-new').textContent = inquiries.filter(i=>i.status==='신규').length;
+    document.getElementById('stat-services').textContent = services.length;
+    document.getElementById('stat-faqs').textContent = faqs.length;
+    const posts = getData(LS_KEYS.posts);
+    document.getElementById('stat-promo').textContent = posts.filter(p=>p.type==='promo').length;
+    document.getElementById('stat-networking').textContent = posts.filter(p=>p.type==='networking').length;
+
+    const recent = [...inquiries].sort((a,b)=> new Date(b.date) - new Date(a.date)).slice(0,5);
+    const body = document.getElementById('recent-inquiries-body');
+    if(recent.length === 0){
+        body.innerHTML = '<tr class="empty-row"><td colspan="4">아직 접수된 문의가 없습니다.</td></tr>';
+    } else {
+        body.innerHTML = recent.map(i => `
+            <tr>
+                <td>${formatDate(i.date)}</td>
+                <td>${escapeHtml(i.name)}</td>
+                <td>${CATEGORY_LABEL[i.category] || i.category}</td>
+                <td>${statusBadge(i.status)}</td>
+            </tr>`).join('');
+    }
+}
+
+/* ---------------- 문의 내역 관리 ---------------- */
+function renderInquiryFilters(){
+    const statuses = ['all','신규','처리중','완료'];
+    const labels = {all:'전체', '신규':'신규', '처리중':'처리중', '완료':'완료'};
+    const row = document.getElementById('inquiry-filter-row');
+    row.innerHTML = statuses.map(s => `
+        <button class="filter-chip ${activeInquiryFilter===s?'active':''}" onclick="setInquiryFilter('${s}')">${labels[s]}</button>
+    `).join('');
+}
+function setInquiryFilter(s){ activeInquiryFilter = s; renderInquiries(); }
+
+function renderInquiries(){
+    renderInquiryFilters();
+    const all = getData(LS_KEYS.inquiries).sort((a,b)=> new Date(b.date) - new Date(a.date));
+    const filtered = activeInquiryFilter === 'all' ? all : all.filter(i=>i.status===activeInquiryFilter);
+    const body = document.getElementById('inquiries-body');
+
+    if(filtered.length === 0){
+        body.innerHTML = '<tr class="empty-row"><td colspan="7">표시할 문의 내역이 없습니다. 홈페이지 1:1 문의 폼을 통해 접수되거나, 상단의 "샘플 데이터 추가" 버튼으로 확인해 보세요.</td></tr>';
+        return;
+    }
+
+    body.innerHTML = filtered.map(i => `
+        <tr>
+            <td>${formatDate(i.date)}</td>
+            <td>${escapeHtml(i.name)}</td>
+            <td>${escapeHtml(i.phone || '-')}</td>
+            <td>${CATEGORY_LABEL[i.category] || i.category}</td>
+            <td class="msg-cell">${escapeHtml(truncate(i.message, 40))} <span class="more" onclick="viewInquiry('${i.id}')">더보기</span></td>
+            <td>
+                <select class="status-select" onchange="changeStatus('${i.id}', this.value)">
+                    <option value="신규" ${i.status==='신규'?'selected':''}>신규</option>
+                    <option value="처리중" ${i.status==='처리중'?'selected':''}>처리중</option>
+                    <option value="완료" ${i.status==='완료'?'selected':''}>완료</option>
+                </select>
+            </td>
+            <td><button class="btn btn-danger btn-sm" onclick="deleteInquiry('${i.id}')">삭제</button></td>
+        </tr>`).join('');
+}
+
+function viewInquiry(id){
+    const item = getData(LS_KEYS.inquiries).find(i=>i.id===id);
+    if(!item) return;
+    document.getElementById('inquiry-detail-body').innerHTML = `
+        <p><b>접수일</b> · ${formatDate(item.date)}</p>
+        <p><b>이름</b> · ${escapeHtml(item.name)}</p>
+        <p><b>이메일</b> · ${escapeHtml(item.email || '-')}</p>
+        <p><b>연락처</b> · ${escapeHtml(item.phone || '-')}</p>
+        <p><b>유형</b> · ${CATEGORY_LABEL[item.category] || item.category}</p>
+        <p style="margin-top:0.6rem;"><b>문의 내용</b></p>
+        <p style="white-space:pre-wrap; background:#f8fafc; border-radius:8px; padding:0.8rem; margin-top:0.3rem;">${escapeHtml(item.message)}</p>
+    `;
+    document.getElementById('inquiry-modal').classList.add('active');
+}
+function changeStatus(id, status){
+    const arr = getData(LS_KEYS.inquiries);
+    const idx = arr.findIndex(i=>i.id===id);
+    if(idx > -1){ arr[idx].status = status; setData(LS_KEYS.inquiries, arr); renderDashboard(); renderInquiries(); }
+}
+function deleteInquiry(id){
+    if(!confirm('이 문의를 삭제하시겠습니까?')) return;
+    setData(LS_KEYS.inquiries, getData(LS_KEYS.inquiries).filter(i=>i.id!==id));
+    renderDashboard(); renderInquiries();
+}
+function clearAllInquiries(){
+    if(!confirm('전체 문의 내역을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
+    setData(LS_KEYS.inquiries, []);
+    renderDashboard(); renderInquiries();
+}
+function seedSampleInquiries(){
+    const samples = [
+        {name:'Nguyen Van A', email:'nguyen.a@example.com', phone:'010-1234-5678', category:'visa', message:'비자 연장 절차가 궁금합니다. 서류는 어떤 것들이 필요한가요?'},
+        {name:'Maria Santos', email:'maria.s@example.com', phone:'010-2222-3333', category:'housing', message:'원룸 전세 계약 시 보증금 보호를 어떻게 받을 수 있는지 상담받고 싶습니다.'},
+        {name:'Chen Wei', email:'chen.wei@example.com', phone:'010-4444-5555', category:'telecom', message:'여권만 있는데 알뜰폰 개통이 가능한가요? 요금제도 안내 부탁드립니다.'}
+    ];
+    const arr = getData(LS_KEYS.inquiries);
+    samples.forEach(s => arr.push({
+        id: 'inq_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
+        date: new Date().toISOString(),
+        status: '신규',
+        ...s
+    }));
+    setData(LS_KEYS.inquiries, arr);
+    renderDashboard(); renderInquiries();
+}
+
+/* ---------------- 서비스 콘텐츠 관리 ---------------- */
+function renderServices(){
+    const services = getData(LS_KEYS.services);
+    const grid = document.getElementById('services-grid');
+    if(services.length === 0){
+        grid.innerHTML = '<p style="color:#94a3b8; font-size:0.85rem;">등록된 서비스가 없습니다.</p>';
+        return;
+    }
+    grid.innerHTML = services.map(s => `
+        <div class="item-card">
+            <div class="row-top">
+                <div class="icon">${s.icon}</div>
+            </div>
+            <div class="tag-label">${escapeHtml(s.badge)}</div>
+            <h3>${escapeHtml(s.title)}</h3>
+            <p>${escapeHtml(s.desc)}</p>
+            <div class="tags">${(s.tags||[]).map(t=>`<span>#${escapeHtml(t)}</span>`).join('')}</div>
+            <div class="actions">
+                <button class="btn btn-outline btn-sm" onclick="openServiceModal('${s.id}')">수정</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteService('${s.id}')">삭제</button>
+            </div>
+        </div>`).join('');
+}
+function openServiceModal(id){
+    document.getElementById('service-edit-id').value = id || '';
+    if(id){
+        const s = getData(LS_KEYS.services).find(x=>x.id===id);
+        document.getElementById('service-modal-title').textContent = '서비스 수정';
+        document.getElementById('service-icon').value = s.icon;
+        document.getElementById('service-badge').value = s.badge;
+        document.getElementById('service-title').value = s.title;
+        document.getElementById('service-desc').value = s.desc;
+        document.getElementById('service-tags').value = (s.tags||[]).join(', ');
+    } else {
+        document.getElementById('service-modal-title').textContent = '새 서비스 추가';
+        ['service-icon','service-badge','service-title','service-desc','service-tags'].forEach(id=>document.getElementById(id).value='');
+    }
+    document.getElementById('service-modal').classList.add('active');
+}
+function saveService(){
+    const id = document.getElementById('service-edit-id').value;
+    const title = document.getElementById('service-title').value.trim();
+    if(!title){ alert('제목을 입력해 주세요.'); return; }
+    const payload = {
+        icon: document.getElementById('service-icon').value.trim() || '🔹',
+        badge: document.getElementById('service-badge').value.trim(),
+        title,
+        desc: document.getElementById('service-desc').value.trim(),
+        tags: document.getElementById('service-tags').value.split(',').map(t=>t.trim()).filter(Boolean).slice(0,3)
+    };
+    const arr = getData(LS_KEYS.services);
+    if(id){
+        const idx = arr.findIndex(x=>x.id===id);
+        arr[idx] = {...arr[idx], ...payload};
+    } else {
+        payload.id = 'svc_' + Date.now();
+        arr.push(payload);
+    }
+    setData(LS_KEYS.services, arr);
+    closeModal('service-modal');
+    renderDashboard(); renderServices();
+}
+function deleteService(id){
+    if(!confirm('이 서비스를 삭제하시겠습니까?')) return;
+    setData(LS_KEYS.services, getData(LS_KEYS.services).filter(s=>s.id!==id));
+    renderDashboard(); renderServices();
+}
+
+/* ---------------- FAQ 관리 ---------------- */
+const FAQ_CATEGORY_ORDER = ['visa','telecom','living','concierge'];
+const FAQ_CATEGORY_LABEL = {visa:'비자 / 행정', telecom:'통신 / 개통', living:'주거 / 의료', concierge:'1:1 컨시어지'};
+
+function renderFaqs(){
+    const faqs = getData(LS_KEYS.faqs);
+    const container = document.getElementById('faqs-container');
+    if(faqs.length === 0){
+        container.innerHTML = '<p style="color:#94a3b8; font-size:0.85rem;">등록된 FAQ가 없습니다.</p>';
+        return;
+    }
+    container.innerHTML = FAQ_CATEGORY_ORDER.map(cat => {
+        const items = faqs.filter(f=>f.category===cat);
+        if(items.length === 0) return '';
+        return `
+        <div class="faq-group">
+            <h3>${FAQ_CATEGORY_LABEL[cat]}</h3>
+            ${items.map(f => `
+                <div class="faq-row">
+                    <div class="q">Q. ${escapeHtml(f.q)}</div>
+                    <div class="a">${escapeHtml(f.a)}</div>
+                    <div class="actions">
+                        <button class="btn btn-outline btn-sm" onclick="openFaqModal('${f.id}')">수정</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteFaq('${f.id}')">삭제</button>
+                    </div>
+                </div>`).join('')}
+        </div>`;
+    }).join('');
+}
+function openFaqModal(id){
+    document.getElementById('faq-edit-id').value = id || '';
+    if(id){
+        const f = getData(LS_KEYS.faqs).find(x=>x.id===id);
+        document.getElementById('faq-modal-title').textContent = 'FAQ 수정';
+        document.getElementById('faq-category').value = f.category;
+        document.getElementById('faq-question').value = f.q;
+        document.getElementById('faq-answer').value = f.a;
+    } else {
+        document.getElementById('faq-modal-title').textContent = '새 FAQ 추가';
+        document.getElementById('faq-category').value = 'visa';
+        document.getElementById('faq-question').value = '';
+        document.getElementById('faq-answer').value = '';
+    }
+    document.getElementById('faq-modal').classList.add('active');
+}
+function saveFaq(){
+    const id = document.getElementById('faq-edit-id').value;
+    const q = document.getElementById('faq-question').value.trim();
+    if(!q){ alert('질문을 입력해 주세요.'); return; }
+    const payload = {
+        category: document.getElementById('faq-category').value,
+        q,
+        a: document.getElementById('faq-answer').value.trim()
+    };
+    const arr = getData(LS_KEYS.faqs);
+    if(id){
+        const idx = arr.findIndex(x=>x.id===id);
+        arr[idx] = {...arr[idx], ...payload};
+    } else {
+        payload.id = 'faq_' + Date.now();
+        arr.push(payload);
+    }
+    setData(LS_KEYS.faqs, arr);
+    closeModal('faq-modal');
+    renderDashboard(); renderFaqs();
+}
+function deleteFaq(id){
+    if(!confirm('이 FAQ를 삭제하시겠습니까?')) return;
+    setData(LS_KEYS.faqs, getData(LS_KEYS.faqs).filter(f=>f.id!==id));
+    renderDashboard(); renderFaqs();
+}
+
+/* ---------------- 프로모션 · 네트워킹 게시글 관리 ---------------- */
+const POST_TYPE_LABEL = {promo:'프로모션', networking:'네트워킹'};
+
+function renderPostTabs(){
+    const tabs = document.getElementById('post-type-tabs');
+    tabs.innerHTML = ['promo','networking'].map(t => `
+        <button class="filter-chip ${activePostType===t?'active':''}" onclick="setPostType('${t}')">${POST_TYPE_LABEL[t]}</button>
+    `).join('');
+}
+function setPostType(t){ activePostType = t; renderPosts(); }
+
+function renderPosts(){
+    renderPostTabs();
+    const posts = getData(LS_KEYS.posts).filter(p=>p.type===activePostType)
+        .sort((a,b)=> new Date(b.date) - new Date(a.date));
+    const grid = document.getElementById('posts-grid');
+    if(posts.length === 0){
+        grid.innerHTML = `<p style="color:#94a3b8; font-size:0.85rem;">등록된 ${POST_TYPE_LABEL[activePostType]} 글이 없습니다. "새 글 작성" 버튼으로 첫 글을 올려보세요.</p>`;
+        return;
+    }
+    grid.innerHTML = posts.map(p => `
+        <div class="item-card">
+            <div class="row-top">
+                <div class="icon">${p.icon || (p.type==='promo' ? '🎁' : '🤝')}</div>
+                ${p.tag ? `<span class="badge badge-progress">${escapeHtml(p.tag)}</span>` : ''}
+            </div>
+            <div class="tag-label">${formatDate(p.date)}</div>
+            <h3>${escapeHtml(p.title)}</h3>
+            <p>${escapeHtml(p.summary)}</p>
+            <div class="actions">
+                <button class="btn btn-outline btn-sm" onclick="openPostModal('${p.id}')">수정</button>
+                <button class="btn btn-danger btn-sm" onclick="deletePost('${p.id}')">삭제</button>
+            </div>
+        </div>`).join('');
+}
+
+function openPostModal(id){
+    document.getElementById('post-edit-id').value = id || '';
+    if(id){
+        const p = getData(LS_KEYS.posts).find(x=>x.id===id);
+        document.getElementById('post-modal-title').textContent = '글 수정';
+        document.getElementById('post-type').value = p.type;
+        document.getElementById('post-icon').value = p.icon || '';
+        document.getElementById('post-title').value = p.title;
+        document.getElementById('post-tag').value = p.tag || '';
+        document.getElementById('post-summary').value = p.summary || '';
+        document.getElementById('post-content').value = p.content || '';
+    } else {
+        document.getElementById('post-modal-title').textContent = '새 글 작성';
+        document.getElementById('post-type').value = activePostType;
+        ['post-icon','post-title','post-tag','post-summary','post-content'].forEach(id=>document.getElementById(id).value='');
+    }
+    document.getElementById('post-modal').classList.add('active');
+}
+function savePost(){
+    const id = document.getElementById('post-edit-id').value;
+    const title = document.getElementById('post-title').value.trim();
+    if(!title){ alert('제목을 입력해 주세요.'); return; }
+    const type = document.getElementById('post-type').value;
+    const payload = {
+        type,
+        icon: document.getElementById('post-icon').value.trim(),
+        title,
+        tag: document.getElementById('post-tag').value.trim(),
+        summary: document.getElementById('post-summary').value.trim(),
+        content: document.getElementById('post-content').value.trim()
+    };
+    const arr = getData(LS_KEYS.posts);
+    if(id){
+        const idx = arr.findIndex(x=>x.id===id);
+        arr[idx] = {...arr[idx], ...payload};
+    } else {
+        payload.id = 'post_' + Date.now();
+        payload.date = new Date().toISOString();
+        arr.push(payload);
+    }
+    setData(LS_KEYS.posts, arr);
+    closeModal('post-modal');
+    activePostType = type;
+    renderDashboard(); renderPosts();
+}
+function deletePost(id){
+    if(!confirm('이 글을 삭제하시겠습니까?')) return;
+    setData(LS_KEYS.posts, getData(LS_KEYS.posts).filter(p=>p.id!==id));
+    renderDashboard(); renderPosts();
+}
+
+/* ---------------- 방문자 통계 ---------------- */
+function readRaw(key){ try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch(e){ return []; } }
+
+function renderAnalytics(){
+    const sessions = readRaw('ieum_analytics_sessions').sort((a,b)=> b.start - a.start);
+    const pageviews = readRaw('ieum_analytics_pageviews');
+    const clicks = readRaw('ieum_analytics_clicks');
+
+    document.getElementById('an-total-sessions').textContent = sessions.length;
+
+    const todayStart = new Date(); todayStart.setHours(0,0,0,0);
+    const todayCount = sessions.filter(s => s.start >= todayStart.getTime()).length;
+    document.getElementById('an-today-sessions').textContent = todayCount;
+
+    const durations = sessions.map(s => Math.max(0, (s.lastActive - s.start)));
+    const avgMs = durations.length ? durations.reduce((a,b)=>a+b,0) / durations.length : 0;
+    document.getElementById('an-avg-duration').textContent = formatDuration(avgMs);
+
+    document.getElementById('an-total-clicks').textContent = clicks.length;
+
+    // 페이지별 조회수
+    const pageCounts = {};
+    pageviews.forEach(p => { pageCounts[p.page] = (pageCounts[p.page]||0) + 1; });
+    const pvBody = document.getElementById('an-pageviews-body');
+    const pvEntries = Object.entries(pageCounts).sort((a,b)=>b[1]-a[1]);
+    pvBody.innerHTML = pvEntries.length ? pvEntries.map(([page,count]) => `
+        <tr><td>${escapeHtml(page)}</td><td>${count}</td></tr>
+    `).join('') : '<tr class="empty-row"><td colspan="2">아직 기록된 조회수가 없습니다. 홈페이지를 둘러보면 여기에 기록됩니다.</td></tr>';
+
+    // 서비스 클릭 순위
+    const clickCounts = {};
+    clicks.forEach(c => { clickCounts[c.label] = (clickCounts[c.label]||0) + 1; });
+    const clBody = document.getElementById('an-clicks-body');
+    const clEntries = Object.entries(clickCounts).sort((a,b)=>b[1]-a[1]);
+    clBody.innerHTML = clEntries.length ? clEntries.map(([label,count]) => `
+        <tr><td>${escapeHtml(label)}</td><td>${count}</td></tr>
+    `).join('') : '<tr class="empty-row"><td colspan="2">아직 기록된 클릭이 없습니다. 홈페이지에서 서비스 카드를 클릭하면 여기에 기록됩니다.</td></tr>';
+
+    // 최근 방문 세션
+    const sBody = document.getElementById('an-sessions-body');
+    sBody.innerHTML = sessions.length ? sessions.slice(0,20).map(s => `
+        <tr>
+            <td>${formatDate(new Date(s.start).toISOString())}</td>
+            <td>${formatDate(new Date(s.lastActive).toISOString())}</td>
+            <td>${formatDuration(s.lastActive - s.start)}</td>
+        </tr>
+    `).join('') : '<tr class="empty-row"><td colspan="3">아직 방문 세션 기록이 없습니다.</td></tr>';
+}
+
+function formatDuration(ms){
+    const totalSec = Math.round(ms / 1000);
+    const min = Math.floor(totalSec / 60);
+    const sec = totalSec % 60;
+    return `${min}분 ${sec}초`;
+}
+
+function clearAnalytics(){
+    if(!confirm('방문자 통계 데이터를 모두 초기화하시겠습니까?')) return;
+    localStorage.removeItem('ieum_analytics_sessions');
+    localStorage.removeItem('ieum_analytics_pageviews');
+    localStorage.removeItem('ieum_analytics_clicks');
+    renderAnalytics();
+}
+
+/* ---------------- 유틸 ---------------- */
+function closeModal(id){ document.getElementById(id).classList.remove('active'); }
+function statusBadge(status){
+    const map = {'신규':'badge-new','처리중':'badge-progress','완료':'badge-done'};
+    return `<span class="badge ${map[status]||'badge-new'}">${status}</span>`;
+}
+function formatDate(iso){
+    const d = new Date(iso);
+    if(isNaN(d)) return iso;
+    return d.getFullYear()+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+String(d.getDate()).padStart(2,'0')+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+}
+function truncate(str, n){ return (str && str.length > n) ? str.slice(0,n)+'…' : (str||''); }
+function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str == null ? '' : String(str);
+    return div.innerHTML;
+}
+document.querySelectorAll('.modal-overlay').forEach(m=>{
+    m.addEventListener('click', e=>{ if(e.target === m) m.classList.remove('active'); });
+});
+</script>
+</body>
+</html>
